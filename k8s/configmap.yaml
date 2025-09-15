@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mercadol-pithing-config
+  namespace: mercadol-pithing
+data:
+  NODE_ENV: "production"
+  API_PORT: "3001"
+  WEB_PORT: "3000"
+  EMBEDDINGS_PORT: "3002"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "mercadol_pithing"
+  MINIO_ENDPOINT: "http://minio:9000"
+  MINIO_BUCKET: "product-images"
+  MINIO_ACCESS_KEY: "minioadmin"
+  MINIO_SECRET_KEY: "minioadmin"
+  ALIYUN_REGION: "cn-hangzhou"
+  ENABLE_SHOPEE_INTEGRATION: "false"
+  ENABLE_WISH_INTEGRATION: "false"
+  ENABLE_ALIBABA_IMAGE_SEARCH: "true"

@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: mercadol-pithing
+  labels:
+    app: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: mercadol-pithing/api:latest
+        ports:
+        - containerPort: 3001
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: NODE_ENV
+        - name: API_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: API_PORT
+        - name: DATABASE_URL
+          value: "postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/mercadol_pithing"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: POSTGRES_PASSWORD
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@redis:6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: REDIS_PASSWORD
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: JWT_SECRET
+        - name: MELI_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: MELI_CLIENT_ID
+        - name: MELI_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: MELI_CLIENT_SECRET
+        - name: MELI_REDIRECT_URI
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: MELI_REDIRECT_URI
+        - name: SHOPEE_PARTNER_ID
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: SHOPEE_PARTNER_ID
+        - name: SHOPEE_PARTNER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: SHOPEE_PARTNER_KEY
+        - name: WISH_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: WISH_CLIENT_ID
+        - name: WISH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: WISH_CLIENT_SECRET
+        - name: WISH_REDIRECT_URI
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: WISH_REDIRECT_URI
+        - name: ALIYUN_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: ALIYUN_ACCESS_KEY_ID
+        - name: ALIYUN_ACCESS_KEY_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: ALIYUN_ACCESS_KEY_SECRET
+        - name: ALIYUN_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: ALIYUN_REGION
+        - name: MINIO_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: MINIO_ENDPOINT
+        - name: MINIO_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: MINIO_BUCKET
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: MINIO_ACCESS_KEY
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: MINIO_SECRET_KEY
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: mercadol-pithing
+spec:
+  selector:
+    app: api
+  ports:
+  - port: 3001
+    targetPort: 3001
+  type: ClusterIP

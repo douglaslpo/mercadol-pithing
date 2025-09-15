@@ -1,0 +1,62 @@
+{{- if .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mercadol-pithing.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  type: {{ .Values.api.service.type }}
+  ports:
+  - port: {{ .Values.api.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "mercadol-pithing.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+{{- end }}
+
+{{- if .Values.web.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mercadol-pithing.fullname" . }}-web
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  type: {{ .Values.web.service.type }}
+  ports:
+  - port: {{ .Values.web.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "mercadol-pithing.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+{{- end }}
+
+{{- if .Values.embeddings.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mercadol-pithing.fullname" . }}-embeddings
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: embeddings
+spec:
+  type: {{ .Values.embeddings.service.type }}
+  ports:
+  - port: {{ .Values.embeddings.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "mercadol-pithing.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: embeddings
+{{- end }}

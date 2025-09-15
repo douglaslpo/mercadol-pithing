@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embeddings
+  namespace: mercadol-pithing
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: embeddings
+  template:
+    metadata:
+      labels:
+        app: embeddings
+    spec:
+      containers:
+      - name: embeddings
+        image: mercadol-pithing/embeddings:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: NODE_ENV
+        - name: EMBEDDINGS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mercadol-pithing-config
+              key: EMBEDDINGS_PORT
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@redis:6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: REDIS_PASSWORD
+        - name: DATABASE_URL
+          value: "postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/mercadol_pithing"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mercadol-pithing-secrets
+              key: POSTGRES_PASSWORD
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: embeddings
+  namespace: mercadol-pithing
+spec:
+  selector:
+    app: embeddings
+  ports:
+  - port: 3002
+    targetPort: 3002
+  type: ClusterIP

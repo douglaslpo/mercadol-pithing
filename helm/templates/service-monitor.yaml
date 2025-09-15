@@ -1,0 +1,67 @@
+{{- if .Values.serviceMonitor.enabled }}
+{{- if .Values.api.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "mercadol-pithing.serviceMonitorName" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "mercadol-pithing.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: {{ .Values.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+{{- end }}
+
+{{- if .Values.web.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "mercadol-pithing.serviceMonitorName" . }}-web
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "mercadol-pithing.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: web
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: {{ .Values.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+{{- end }}
+
+{{- if .Values.embeddings.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "mercadol-pithing.serviceMonitorName" . }}-embeddings
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: embeddings
+    {{- toYaml .Values.serviceMonitor.labels | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "mercadol-pithing.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: embeddings
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: {{ .Values.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+{{- end }}
+{{- end }}

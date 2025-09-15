@@ -1,0 +1,302 @@
+# Production values for mercadol-pithing
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# Application configuration
+app:
+  name: mercadol-pithing
+  version: "1.0.0"
+  environment: "prod"
+  replicas: 5
+
+# API configuration
+api:
+  enabled: true
+  image:
+    repository: mercadol-pithing/api
+    tag: "prod"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3001
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# Web configuration
+web:
+  enabled: true
+  image:
+    repository: mercadol-pithing/web
+    tag: "prod"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "400m"
+    limits:
+      memory: "1Gi"
+      cpu: "800m"
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# Embeddings service configuration
+embeddings:
+  enabled: true
+  image:
+    repository: mercadol-pithing/embeddings
+    tag: "prod"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3002
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "2000m"
+    limits:
+      memory: "4Gi"
+      cpu: "4000m"
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres"
+    database: "mercadol_pithing_prod"
+  primary:
+    persistence:
+      enabled: true
+      size: 100Gi
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "2000m"
+      limits:
+        memory: "4Gi"
+        cpu: "4000m"
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "redis"
+  master:
+    persistence:
+      enabled: true
+      size: 50Gi
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+      limits:
+        memory: "2Gi"
+        cpu: "2000m"
+
+# MinIO configuration
+minio:
+  enabled: true
+  auth:
+    rootUser: "minioadmin"
+    rootPassword: "minioadmin"
+  defaultBuckets: "product-images"
+  persistence:
+    enabled: true
+    size: 200Gi
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+
+# Prometheus configuration
+prometheus:
+  enabled: true
+  server:
+    persistentVolume:
+      enabled: true
+      size: 50Gi
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "2000m"
+      limits:
+        memory: "4Gi"
+        cpu: "4000m"
+
+# Grafana configuration
+grafana:
+  enabled: true
+  adminPassword: "admin"
+  persistence:
+    enabled: true
+    size: 20Gi
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+# Jaeger configuration
+jaeger:
+  enabled: true
+  strategy: allInOne
+  allInOne:
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+      limits:
+        memory: "2Gi"
+        cpu: "2000m"
+
+# Elasticsearch configuration
+elasticsearch:
+  enabled: true
+  master:
+    replicas: 5
+    persistence:
+      enabled: true
+      size: 50Gi
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "2000m"
+      limits:
+        memory: "4Gi"
+        cpu: "4000m"
+  data:
+    replicas: 5
+    persistence:
+      enabled: true
+      size: 200Gi
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "2000m"
+      limits:
+        memory: "4Gi"
+        cpu: "4000m"
+
+# Kibana configuration
+kibana:
+  enabled: true
+  replicas: 3
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/rate-limit: "500"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+  hosts:
+    - host: mercadol-pithing.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            name: web
+            port: 3000
+        - path: /api
+          pathType: Prefix
+          service:
+            name: api
+            port: 3001
+        - path: /embeddings
+          pathType: Prefix
+          service:
+            name: embeddings
+            port: 3002
+  tls:
+    - secretName: mercadol-pithing-prod-tls
+      hosts:
+        - mercadol-pithing.example.com
+
+# Network Policy configuration
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+  egress:
+    enabled: true
+
+# Pod Disruption Budget configuration
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 3
+
+# Service Monitor configuration
+serviceMonitor:
+  enabled: true
+  labels:
+    app: mercadol-pithing
+  interval: 30s
+  scrapeTimeout: 10s
+
+# Cert Manager configuration
+certManager:
+  enabled: true
+  clusterIssuer: "letsencrypt-prod"
+  email: "admin@mercadol-pithing.com"
+
+# Istio configuration
+istio:
+  enabled: true
+  gateway:
+    enabled: true
+  virtualService:
+    enabled: true
+
+# ArgoCD configuration
+argocd:
+  enabled: true
+  server:
+    enabled: true
+    service:
+      type: ClusterIP
+      port: 80

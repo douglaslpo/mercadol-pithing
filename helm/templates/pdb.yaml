@@ -1,0 +1,52 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+{{- if .Values.api.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "mercadol-pithing.pdbName" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "mercadol-pithing.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+{{- end }}
+
+{{- if .Values.web.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "mercadol-pithing.pdbName" . }}-web
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "mercadol-pithing.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: web
+{{- end }}
+
+{{- if .Values.embeddings.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "mercadol-pithing.pdbName" . }}-embeddings
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+    app.kubernetes.io/component: embeddings
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "mercadol-pithing.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: embeddings
+{{- end }}
+{{- end }}

@@ -1,0 +1,135 @@
+{{- if .Values.argocd.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ include "mercadol-pithing.argocdName" . }}
+  namespace: {{ .Values.argocd.application.namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+spec:
+  project: {{ .Values.argocd.project.name }}
+  source:
+    repoURL: {{ .Values.argocd.application.source.repoURL }}
+    targetRevision: {{ .Values.argocd.application.source.targetRevision }}
+    path: {{ .Values.argocd.application.source.path }}
+  destination:
+    server: {{ .Values.argocd.application.destination.server }}
+    namespace: {{ .Values.argocd.application.destination.namespace }}
+  syncPolicy:
+    automated:
+      prune: {{ .Values.argocd.application.syncPolicy.automated.prune }}
+      selfHeal: {{ .Values.argocd.application.syncPolicy.automated.selfHeal }}
+    syncOptions:
+      {{- toYaml .Values.argocd.application.syncPolicy.syncOptions | nindent 6 }}
+    retry:
+      limit: {{ .Values.argocd.application.syncPolicy.retry.limit }}
+      backoff:
+        duration: {{ .Values.argocd.application.syncPolicy.retry.backoff.duration }}
+        factor: {{ .Values.argocd.application.syncPolicy.retry.backoff.factor }}
+        maxDuration: {{ .Values.argocd.application.syncPolicy.retry.backoff.maxDuration }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ .Values.argocd.project.name }}
+  namespace: {{ .Values.argocd.application.namespace }}
+  labels:
+    {{- include "mercadol-pithing.labels" . | nindent 4 }}
+spec:
+  description: {{ .Values.argocd.project.description }}
+  sourceRepos:
+  - {{ .Values.argocd.application.source.repoURL }}
+  destinations:
+  - namespace: {{ .Values.argocd.application.destination.namespace }}
+    server: {{ .Values.argocd.application.destination.server }}
+  clusterResourceWhitelist:
+  - group: ""
+    kind: Namespace
+  - group: ""
+    kind: PersistentVolume
+  - group: ""
+    kind: PersistentVolumeClaim
+  - group: ""
+    kind: Secret
+  - group: ""
+    kind: ConfigMap
+  - group: ""
+    kind: Service
+  - group: ""
+    kind: ServiceAccount
+  - group: ""
+    kind: Endpoints
+  - group: ""
+    kind: Pod
+  - group: apps
+    kind: Deployment
+  - group: apps
+    kind: ReplicaSet
+  - group: apps
+    kind: StatefulSet
+  - group: apps
+    kind: DaemonSet
+  - group: apps
+    kind: PodDisruptionBudget
+  - group: autoscaling
+    kind: HorizontalPodAutoscaler
+  - group: networking.k8s.io
+    kind: NetworkPolicy
+  - group: networking.k8s.io
+    kind: Ingress
+  - group: policy
+    kind: PodDisruptionBudget
+  - group: monitoring.coreos.com
+    kind: ServiceMonitor
+  - group: cert-manager.io
+    kind: Certificate
+  - group: cert-manager.io
+    kind: ClusterIssuer
+  - group: networking.istio.io
+    kind: VirtualService
+  - group: networking.istio.io
+    kind: Gateway
+  - group: networking.istio.io
+    kind: DestinationRule
+  namespaceResourceWhitelist:
+  - group: ""
+    kind: Secret
+  - group: ""
+    kind: ConfigMap
+  - group: ""
+    kind: Service
+  - group: ""
+    kind: ServiceAccount
+  - group: ""
+    kind: Endpoints
+  - group: ""
+    kind: Pod
+  - group: apps
+    kind: Deployment
+  - group: apps
+    kind: ReplicaSet
+  - group: apps
+    kind: StatefulSet
+  - group: apps
+    kind: DaemonSet
+  - group: apps
+    kind: PodDisruptionBudget
+  - group: autoscaling
+    kind: HorizontalPodAutoscaler
+  - group: networking.k8s.io
+    kind: NetworkPolicy
+  - group: networking.k8s.io
+    kind: Ingress
+  - group: policy
+    kind: PodDisruptionBudget
+  - group: monitoring.coreos.com
+    kind: ServiceMonitor
+  - group: cert-manager.io
+    kind: Certificate
+  - group: networking.istio.io
+    kind: VirtualService
+  - group: networking.istio.io
+    kind: Gateway
+  - group: networking.istio.io
+    kind: DestinationRule
+{{- end }}

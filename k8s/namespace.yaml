@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mercadol-pithing
+  labels:
+    name: mercadol-pithing
+    app: mercadol-pithing

@@ -1,0 +1,131 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mercadol-pithing
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mercadol-pithing/k8s.git
+    targetRevision: HEAD
+    path: k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mercadol-pithing
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: mercadol-pithing
+  namespace: argocd
+spec:
+  description: MercadoL Pithing Application Project
+  sourceRepos:
+  - https://github.com/mercadol-pithing/k8s.git
+  destinations:
+  - namespace: mercadol-pithing
+    server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+  - group: ""
+    kind: Namespace
+  - group: ""
+    kind: PersistentVolume
+  - group: ""
+    kind: PersistentVolumeClaim
+  - group: ""
+    kind: Secret
+  - group: ""
+    kind: ConfigMap
+  - group: ""
+    kind: Service
+  - group: ""
+    kind: ServiceAccount
+  - group: ""
+    kind: Endpoints
+  - group: ""
+    kind: Pod
+  - group: apps
+    kind: Deployment
+  - group: apps
+    kind: ReplicaSet
+  - group: apps
+    kind: StatefulSet
+  - group: apps
+    kind: DaemonSet
+  - group: apps
+    kind: PodDisruptionBudget
+  - group: autoscaling
+    kind: HorizontalPodAutoscaler
+  - group: networking.k8s.io
+    kind: NetworkPolicy
+  - group: networking.k8s.io
+    kind: Ingress
+  - group: policy
+    kind: PodDisruptionBudget
+  - group: monitoring.coreos.com
+    kind: ServiceMonitor
+  - group: cert-manager.io
+    kind: Certificate
+  - group: cert-manager.io
+    kind: ClusterIssuer
+  - group: networking.istio.io
+    kind: VirtualService
+  - group: networking.istio.io
+    kind: Gateway
+  - group: networking.istio.io
+    kind: DestinationRule
+  namespaceResourceWhitelist:
+  - group: ""
+    kind: Secret
+  - group: ""
+    kind: ConfigMap
+  - group: ""
+    kind: Service
+  - group: ""
+    kind: ServiceAccount
+  - group: ""
+    kind: Endpoints
+  - group: ""
+    kind: Pod
+  - group: apps
+    kind: Deployment
+  - group: apps
+    kind: ReplicaSet
+  - group: apps
+    kind: StatefulSet
+  - group: apps
+    kind: DaemonSet
+  - group: apps
+    kind: PodDisruptionBudget
+  - group: autoscaling
+    kind: HorizontalPodAutoscaler
+  - group: networking.k8s.io
+    kind: NetworkPolicy
+  - group: networking.k8s.io
+    kind: Ingress
+  - group: policy
+    kind: PodDisruptionBudget
+  - group: monitoring.coreos.com
+    kind: ServiceMonitor
+  - group: cert-manager.io
+    kind: Certificate
+  - group: networking.istio.io
+    kind: VirtualService
+  - group: networking.istio.io
+    kind: Gateway
+  - group: networking.istio.io
+    kind: DestinationRule

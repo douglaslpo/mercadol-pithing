@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    "config:js-app",
+    "config:js-lib"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@nestjs/"],
+      "groupName": "NestJS packages"
+    },
+    {
+      "matchPackagePatterns": ["^@radix-ui/"],
+      "groupName": "Radix UI packages"
+    },
+    {
+      "matchPackagePatterns": ["^@tensorflow/"],
+      "groupName": "TensorFlow packages"
+    },
+    {
+      "matchPackagePatterns": ["^@types/"],
+      "groupName": "TypeScript types"
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "dev dependencies"
+    }
+  ],
+  "schedule": ["before 6am on monday"],
+  "timezone": "America/Sao_Paulo",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": ["dependencies"],
+  "assignees": ["douglas"],
+  "reviewers": ["douglas"],
+  "commitMessagePrefix": "chore:",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps"
+}
